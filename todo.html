@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('image2.jpg');
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            padding: 0;
+            color: aliceblue;
+        }
+
+        
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .form-group input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            margin-right: 10px;
+        }
+
+        .form-group button {
+            padding: 10px 20px;
+            background: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .form-group button:hover {
+            background: #218838;
+        }
+
+        .task-list {
+            margin-top: 20px;
+        }
+
+        .task {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .task:last-child {
+            border-bottom: none;
+        }
+
+        .task button {
+            padding: 5px 10px;
+            background: #f00;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .task button:hover {
+            background: #d00;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>To-Do List</h1>
+
+        <div class="form-group">
+            <input type="text" id="taskInput" placeholder="Enter your task">
+            <button onclick="addTask()">Add Task</button>
+            
+        </div>
+
+        <div class="task-list" id="taskList">
+            <!-- Tasks will be dynamically added here -->
+        </div>
+    </div>
+
+    <script>
+        const taskList = document.getElementById('taskList');
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || []; // Load tasks from localStorage or initialize as an empty array
+    
+        // Render tasks on page load
+        renderTasks();
+    
+        // Function to add a new task
+        function addTask() {
+            const taskInput = document.getElementById('taskInput');
+            const taskText = taskInput.value.trim();
+    
+            if (taskText === '') {
+                alert('Task cannot be empty!');
+                return;
+            }
+    
+            const taskId = tasks.length > 0 ? tasks[tasks.length - 1].id + 1 : 1;
+            const task = { id: taskId, task: taskText };
+    
+            tasks.push(task); // Add the task to the array
+            saveTasks(); // Save tasks to localStorage
+            renderTasks();
+    
+            taskInput.value = ''; // Clear the input field
+        }
+    
+        // Function to render tasks to the HTML
+        function renderTasks() {
+            taskList.innerHTML = ''; // Clear the current task list
+    
+            tasks.forEach((task) => {
+                const taskElement = document.createElement('div');
+                taskElement.className = 'task';
+                taskElement.innerHTML = `
+                    <span>${task.id}. ${task.task}</span>
+                    <button onclick="deleteTask(${task.id})">Delete</button>
+                    <button onclick="updateTask(${task.id})">Update</button>
+                `;
+                taskList.appendChild(taskElement);
+            });
+        }
+    
+        // Function to delete a task
+        function deleteTask(taskId) {
+            tasks = tasks.filter(task => task.id !== taskId); // Remove the task from the array
+            saveTasks(); // Save updated tasks to localStorage
+            renderTasks();
+        }
+    
+        // Function to update a task
+        function updateTask(taskId) {
+            const task = tasks.find(task => task.id === taskId);
+            if (task) {
+                const newTaskText = prompt('Update your task:', task.task);
+                if (newTaskText !== null && newTaskText.trim() !== '') {
+                    task.task = newTaskText.trim();
+                    saveTasks(); // Save updated tasks to localStorage
+                    renderTasks();
+                } else {
+                    alert('Task cannot be empty!');
+                }
+            }
+        }
+    
+        // Function to save tasks to localStorage
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks)); // Store the tasks array in localStorage
+        }
+    </script>
+    
+</body>
+
+</html>
